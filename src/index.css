@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --color-brand-red: #ff0000;
+  --color-brand-black: #0a0a0a;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-black text-white font-sans antialiased transition-colors duration-300;
+  }
+  
+  .light body {
+    @apply bg-slate-50 text-slate-900;
+  }
+
+  .light .bg-brand-black {
+    @apply bg-slate-50;
+  }
+
+  .light nav {
+    @apply bg-white border-slate-200;
+  }
+
+  .light .text-white {
+    @apply text-slate-900;
+  }
+
+  .light .text-white\/60 {
+    @apply text-slate-600;
+  }
+
+  .light .text-white\/40 {
+    @apply text-slate-500;
+  }
+
+  .light .text-white\/20 {
+    @apply text-slate-400;
+  }
+
+  .light .bg-white\/5 {
+    @apply bg-slate-100;
+  }
+
+  .light .bg-white\/10 {
+    @apply bg-slate-200;
+  }
+
+  .light .border-white\/10 {
+    @apply border-slate-200;
+  }
+
+  .light .input-field {
+    @apply bg-white border-slate-200 text-slate-900 focus:border-brand-red;
+  }
+
+  .light .glass-card {
+    @apply bg-white border-slate-200 shadow-sm text-slate-900;
+  }
+
+  .light .btn-secondary {
+    @apply bg-slate-200 hover:bg-slate-300 text-slate-900;
+  }
+
+  .light .prose {
+    @apply text-slate-800;
+  }
+
+  .light .prose h1, .light .prose h2, .light .prose h3 {
+    @apply text-slate-900;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl transition-all;
+}
+
+.btn-primary {
+  @apply bg-brand-red hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-all active:scale-95 disabled:opacity-50;
+}
+
+.btn-secondary {
+  @apply bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl transition-all active:scale-95;
+}
+
+.input-field {
+  @apply bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-red transition-all text-white;
+}
