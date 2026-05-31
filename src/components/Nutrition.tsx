@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Utensils, Apple, Calculator, MessageSquare, Crown, Camera, Loader2, Send, Plus, History, TrendingUp, ChefHat, Pill, Brain, Droplets } from 'lucide-react';
 import Markdown from 'react-markdown';
-import { GoogleGenAI } from "@google/genai";
 import { motion, AnimatePresence } from 'motion/react';
 import { calculateBMR, getMacros } from '../utils/fitness';
 import { Plans } from '../types';
@@ -106,14 +105,12 @@ export default function Nutrition({ plans, user, profile, onNavigate }: Nutritio
     setLoading(true);
     try {
       // Use AI to parse the meal description
-      const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await aiInstance.models.generateContent({
-        model: "gemini-flash-latest",
-        contents: [{
-          parts: [{ text: `Analise esta refeição e quantidade: "${manualMeal.name}". Retorne APENAS um JSON com: { name, calories, protein, carbs, fat }. Seja preciso e realista. Se o usuário não especificou quantidade, use porções padrão.` }]
-        }],
+      const { aiService } = await import('../services/aiService');
+      const responseText = await aiService.generateContent({
+        prompt: `Analise esta refeição e quantidade: "${manualMeal.name}". Retorne APENAS um JSON com: { name, calories, protein, carbs, fat }. Seja preciso e realista. Se o usuário não especificou quantidade, use porções padrão.`,
+        responseMimeType: "application/json"
       });
-      const mealData = JSON.parse(response.text.replace(/```json|```/g, '').trim());
+      const mealData = JSON.parse(responseText.replace(/```json|```/g, '').trim());
 
       const res = await fetch('/api/nutrition/meal', {
         method: 'POST',
@@ -155,18 +152,14 @@ export default function Nutrition({ plans, user, profile, onNavigate }: Nutritio
           r.readAsDataURL(file);
         })) as string;
 
-        const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-        const response = await aiInstance.models.generateContent({
-          model: "gemini-flash-latest",
-          contents: [{
-            parts: [
-              { text: "Analise esta foto de comida e retorne APENAS um JSON com: { name, calories, protein, carbs, fat }. Seja preciso." },
-              { inlineData: { data: base64Data, mimeType: file.type } }
-            ]
-          }],
+        const { aiService } = await import('../services/aiService');
+        const responseText = await aiService.generateContent({
+          prompt: "Analise esta foto de comida e retorne APENAS um JSON com: { name, calories, protein, carbs, fat }. Seja preciso.",
+          responseMimeType: "application/json",
+          media: [{ data: base64Data, mimeType: file.type }]
         });
         
-        const result = JSON.parse(response.text.replace(/```json|```/g, '').trim());
+        const result = JSON.parse(responseText.replace(/```json|```/g, '').trim());
         setMacroResult(`Identificado: ${result.name}. Macros: P:${result.protein}g, C:${result.carbs}g, G:${result.fat}g. Cal:${result.calories}`);
         
         // Automatically add the meal
@@ -273,12 +266,9 @@ export default function Nutrition({ plans, user, profile, onNavigate }: Nutritio
         A receita deve ser MUITO gostosa, usando técnicas saudáveis (Airfryer, ingredientes integrais, substitutos de açúcar).
         Responda em Português (Brasil) usando Markdown.
       `;
-      const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await aiInstance.models.generateContent({
-        model: "gemini-flash-latest",
-        contents: [{ parts: [{ text: prompt }] }],
-      });
-      setRecipe(response.text);
+      const { aiService } = await import('../services/aiService');
+      const recipeText = await aiService.generateContent({ prompt });
+      setRecipe(recipeText);
     } catch (e) {
       console.error(e);
       setRecipe("Erro ao sugerir receita. Tente novamente.");
@@ -307,13 +297,13 @@ export default function Nutrition({ plans, user, profile, onNavigate }: Nutritio
         { "name": "string", "time": "string", "items": ["string"], "calories": number, "protein": number, "carbs": number, "fat": number }
       `;
 
-      const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await aiInstance.models.generateContent({
-        model: "gemini-flash-latest",
-        contents: [{ parts: [{ text: promptText }] }],
+      const { aiService } = await import('../services/aiService');
+      const swapResponse = await aiService.generateContent({
+        prompt: promptText,
+        responseMimeType: "application/json"
       });
       
-      const newMeal = JSON.parse(response.text.replace(/```json|```/g, '').trim());
+      const newMeal = JSON.parse(swapResponse.replace(/```json|```/g, '').trim());
       schedule[mealIndex] = newMeal;
       
       // Update backend and state
