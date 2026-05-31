@@ -9,8 +9,14 @@ interface GenerateParams {
 
 class AIService {
   async generateContent(params: GenerateParams): Promise<string> {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Não autenticado');
+    let token = localStorage.getItem('token');
+    
+    // Se o token parecer uma API key (começa com sk- ou AIza), limpa e força logout
+    if (!token || token.startsWith('sk-') || token.startsWith('AIza') || token.length > 500) {
+      localStorage.removeItem('token');
+      window.location.reload();
+      throw new Error('Sessão inválida. Faça login novamente.');
+    }
 
     const res = await fetch('/api/ai/openai/generate', {
       method: 'POST',
