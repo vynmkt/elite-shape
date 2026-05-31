@@ -1,3 +1,4 @@
+// OpenAI only - no Gemini - v2.0.1
 export type AIProvider = 'openai';
 
 interface GenerateParams {

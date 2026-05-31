@@ -1,3 +1,4 @@
+// v2.0.1 - OpenAI only build
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Dumbbell, Mail, Lock, User, ArrowRight, Loader2, AlertCircle, Crown, Trophy, Eye, EyeOff, Sun, Moon, Globe, Camera, TrendingUp, CheckCircle2, HelpCircle, BrainCircuit, Utensils, MessageSquare, ChevronRight } from 'lucide-react';
