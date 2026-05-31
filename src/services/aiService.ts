@@ -9,11 +9,14 @@ interface GenerateParams {
 
 class AIService {
   async generateContent(params: GenerateParams): Promise<string> {
-    const res = await fetch('/api/ai?action=generate', {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Não autenticado');
+
+    const res = await fetch('/api/ai/openai/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         prompt: params.prompt,
@@ -24,8 +27,8 @@ class AIService {
     });
 
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || "Erro na IA");
+      const error = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+      throw new Error(error.error || 'Erro na IA');
     }
 
     const data = await res.json();
